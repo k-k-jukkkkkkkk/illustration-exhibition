@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMINA - 私のイラスト展示室</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">LUMINA</div>
+            <nav>
+                <a href="#home">ホーム</a>
+                <a href="#gallery">作品展</a>
+                <a href="#about">作家について</a>
+            </nav>
+        </div>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>私のイラスト展示室</h1>
+            <p class="subtitle">静寂の中に宿る、美しい瞬間たち</p>
+            <a href="#gallery" class="btn">作品を見る</a>
+        </div>
+    </section>
+
+    <section id="gallery" class="gallery-section">
+        <div class="container">
+            <h2 class="section-title">Exhibition</h2>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">すべて</button>
+                <button class="filter-btn" data-filter="digital">デジタル</button>
+                <button class="filter-btn" data-filter="traditional">アナログ</button>
+                <button class="filter-btn" data-filter="other">その他</button>
+            </div>
+
+            <div class="gallery-grid" id="gallery-grid"></div>
+        </div>
+    </section>
+
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title">About the Artist</h2>
+            <div class="about-content">
+                <p>ここに自分のプロフィールやコンセプトを書いてください。<br>例：「日常のささやかな美しさを、柔らかいタッチで描いています。」</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- モーダル -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <img id="modal-img" src="" alt="">
+            <div class="modal-info">
+                <h3 id="modal-title"></h3>
+                <p id="modal-desc"></p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 あなたの名前. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
