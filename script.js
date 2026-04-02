@@ -1,101 +1,80 @@
-const artworks = [
-    {
-        id: 1,
-        title: "夕暮れの街",
-        desc: "2025年作。デジタルイラスト。静かな夕暮れの情景。",
-        category: "digital",
-        img: "images/artwork1.jpg"
-    },
-    {
-        id: 2,
-        title: "静寂の森",
-        desc: "2025年作。水彩風デジタルアート。",
-        category: "digital",
-        img: "images/artwork2.jpg"
-    },
-    {
-        id: 3,
-        title: "猫の午後",
-        desc: "2024年作。アナログイラスト（色鉛筆）。",
-        category: "traditional",
-        img: "images/artwork3.jpg"
-    },
-    {
-        id: 4,
-        title: "雨の記憶",
-        desc: "2025年作。デジタル。",
-        category: "digital",
-        img: "images/artwork4.jpg"
-    }
-    // ← ここに自分の作品を追加してください！
-    // 例：
-    // {
-    //     id: 5,
-    //     title: "新しい作品タイトル",
-    //     desc: "ここに説明を書きます。",
-    //     category: "digital",   // または "traditional" / "other"
-    //     img: "images/artwork5.jpg"
-    // }
-];
+// =============================================
+// 自動で images フォルダを読み込むバージョン
+// =============================================
 
-document.addEventListener('DOMContentLoaded', () => {
+const USERNAME = "k-j-jukkkkkkk";   // ← ここをあなたのGitHubユーザー名に変更
+const REPO = "illustration-exhibition";   // ← リポジトリ名（変更してなければこのままでOK）
+
+// 作品を自動で読み込んで表示する関数
+async function loadImagesFromGitHub() {
     const grid = document.getElementById('gallery-grid');
-    const modal = document.getElementById('modal');
-    const modalImg = document.getElementById('modal-img');
-    const modalTitle = document.getElementById('modal-title');
-    const modalDesc = document.getElementById('modal-desc');
-    const closeModal = document.querySelector('.close-modal');
+    grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:40px;">画像を読み込み中...</p>';
 
-    function renderArtworks(filteredArtworks) {
-        grid.innerHTML = '';
-        filteredArtworks.forEach(art => {
-            const card = document.createElement('div');
-            card.className = 'art-card';
-            card.innerHTML = `
-                <img src="${art.img}" alt="${art.title}">
-                <div class="art-overlay">
-                    <h3>${art.title}</h3>
-                </div>
-            `;
-            card.addEventListener('click', () => {
-                modalImg.src = art.img;
-                modalTitle.textContent = art.title;
-                modalDesc.textContent = art.desc;
-                modal.style.display = 'flex';
-            });
-            grid.appendChild(card);
-        });
-    }
-
-    // 初期表示
-    renderArtworks(artworks);
-
-    // フィルター
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const filter = btn.dataset.filter;
-            if (filter === 'all') {
-                renderArtworks(artworks);
-            } else {
-                const filtered = artworks.filter(art => art.category === filter);
-                renderArtworks(filtered);
-            }
-        });
-    });
-
-    // モーダル閉じる
-    closeModal.addEventListener('click', () => { modal.style.display = 'none'; });
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.style.display = 'none';
-    });
-    document.addEventListener('keydown', (e) => {
-        if (e.key === "Escape" && modal.style.display === 'flex') {
-            modal.style.display = 'none';
+    try {
+        const response = await fetch(`https://api.github.com/repos/${USERNAME}/${REPO}/contents/images`);
+        
+        if (!response.ok) {
+            throw new Error('フォルダが見つかりません');
         }
-    });
 
-    console.log('%c✅ LUMINA展示場が起動しました！', 'color:#d4af77; font-size:16px');
+        const files = await response.json();
+
+        // 画像ファイルだけをフィルタリング
+        const artworks = files
+            .filter(file => file.name.match(/\.(jpg|jpeg|png|webp|gif)$/i))
+            .map((file, index) => ({
+                id: index + 1,
+                title: file.name.replace(/\.[^/.]+$/, ""),   // ファイル名から拡張子を削除してタイトルに
+                desc: "自動読み込みされた作品です。タイトルは後で編集できます。",
+                category: "digital",
+                img: `images/${file.name}`
+            }));
+
+        if (artworks.length === 0) {
+            grid.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:40px;">imagesフォルダに画像がありません</p>';
+            return;
+        }
+
+        renderArtworks(artworks);
+
+    } catch (error) {
+        console.error("画像読み込みエラー:", error);
+        grid.innerHTML = `<p style="text-align:center; grid-column:1/-1; padding:40px; color:#ff6b6b;">
+            画像の自動読み込みに失敗しました。<br>
+            手動で作品を追加するか、imagesフォルダに画像があるか確認してください。
+        </p>`;
+    }
+}
+
+// 作品を表示する関数（元のコードからほぼそのまま）
+function renderArtworks(artworks) {
+    const grid = document.getElementById('gallery-grid');
+    grid.innerHTML = '';
+
+    artworks.forEach(art => {
+        const card = document.createElement('div');
+        card.className = 'art-card';
+        card.innerHTML = `
+            <img src="${art.img}" alt="${art.title}">
+            <div class="art-overlay">
+                <h3>${art.title}</h3>
+            </div>
+        `;
+        card.addEventListener('click', () => {
+            document.getElementById('modal-img').src = art.img;
+            document.getElementById('modal-title').textContent = art.title;
+            document.getElementById('modal-desc').textContent = art.desc;
+            document.getElementById('modal').style.display = 'flex';
+        });
+        grid.appendChild(card);
+    });
+}
+
+// ページが読み込まれたら自動実行
+document.addEventListener('DOMContentLoaded', () => {
+    loadImagesFromGitHub();
+
+    // フィルターボタンは一旦無効化（自動読み込み版ではシンプルに）
+    // 必要なら後で拡張できます
+    console.log('%c✅ 自動画像読み込みモードで起動しました！', 'color:#d4af77; font-size:16px');
 });
